@@ -3,7 +3,7 @@ package workerpool
 import (
 	"time"
 
-	"search-radius/go-common/pkg/algorithm"
+	"search-radius/pkg/algorithm"
 )
 
 var _ Queue = (*fifoQueue)(nil)

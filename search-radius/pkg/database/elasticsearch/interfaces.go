@@ -1,9 +1,11 @@
 package elasticsearch
 
 import (
-	"context"
 	"io"
 	"net/http"
+
+	"search-radius/pkg/constraints"
+	"search-radius/pkg/database"
 
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 )
@@ -23,18 +25,11 @@ type ElasticClient interface {
 	Perform(*http.Request) (*http.Response, error)
 }
 
-// Document interface that all models must implement
-type Document interface {
-	GetID() string
-	SetID(id string)
+// Model interface that all models must implement
+type Model[ID constraints.ID] interface {
+	GetID() ID
+	SetID(id ID)
 }
 
-// Repository defines the common interface for all repositories
-type Repository[T Document] interface {
-	Get(ctx context.Context, docID string) (*T, error)
-	Index(ctx context.Context, doc *T) error
-	Delete(ctx context.Context, docID string) error
-	Search(ctx context.Context, query io.Reader) ([]T, error)
-	BatchIndex(ctx context.Context, docs []*T) error
-	BatchDelete(ctx context.Context, docIDs []string) error
-}
+// Repository aliases the common interface
+type Repository[T Model[ID], ID constraints.ID] database.Repository[T, ID]

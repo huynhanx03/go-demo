@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/IBM/sarama"
-	
-	"search-radius/go-common/pkg/utils"
+
+	"search-radius/pkg/utils"
 )
 
 // syncProducer wraps sarama.SyncProducer for reliable, blocking sends.

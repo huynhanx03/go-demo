@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/IBM/sarama"
-	
-	"search-radius/go-common/pkg/utils"
+
+	"search-radius/pkg/utils"
 )
 
 // consumerGroup wraps sarama.ConsumerGroup

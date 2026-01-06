@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"search-radius/go-common/pkg/common/apperr"
+	"search-radius/pkg/common/apperr"
 )
 
 type Data struct {

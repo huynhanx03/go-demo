@@ -1,18 +1,22 @@
 package elasticsearch
 
-import "time"
+import (
+	"time"
 
-// BaseDocument contains common fields for all Elasticsearch documents
-type BaseDocument struct {
-	ID        string    `json:"id"`
+	"search-radius/pkg/constraints"
+)
+
+// BaseModel contains common fields for all Elasticsearch documents
+type BaseModel[ID constraints.ID] struct {
+	ID        ID        `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// NewBaseDocument creates a new BaseDocument with current timestamp
-func NewBaseDocument(id string) BaseDocument {
+// NewBaseModel creates a new BaseModel with current timestamp
+func NewBaseModel[ID constraints.ID](id ID) BaseModel[ID] {
 	now := time.Now()
-	return BaseDocument{
+	return BaseModel[ID]{
 		ID:        id,
 		CreatedAt: now,
 		UpdatedAt: now,
@@ -20,11 +24,11 @@ func NewBaseDocument(id string) BaseDocument {
 }
 
 // GetID returns the document ID
-func (b *BaseDocument) GetID() string {
+func (b *BaseModel[ID]) GetID() ID {
 	return b.ID
 }
 
 // SetID sets the document ID
-func (b *BaseDocument) SetID(id string) {
+func (b *BaseModel[ID]) SetID(id ID) {
 	b.ID = id
 }

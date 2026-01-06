@@ -6,8 +6,8 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
-	
-	"search-radius/go-common/pkg/settings"
+
+	"search-radius/pkg/settings"
 )
 
 // Client wraps elasticsearch.Client

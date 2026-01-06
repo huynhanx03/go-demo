@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"search-radius/go-common/pkg/common/locks"
+	"search-radius/pkg/common/locks"
 )
 
 const (

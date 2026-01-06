@@ -9,8 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"search-radius/go-common/pkg/settings"
-	"search-radius/go-common/pkg/utils"
+	"search-radius/pkg/settings"
+	"search-radius/pkg/utils"
 )
 
 const (

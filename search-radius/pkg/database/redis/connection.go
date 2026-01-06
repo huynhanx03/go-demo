@@ -3,7 +3,7 @@ package redis
 import (
 	"fmt"
 
-	"search-radius/go-common/pkg/settings"
+	"search-radius/pkg/settings"
 )
 
 // NewConnection creates and returns a new Redis client

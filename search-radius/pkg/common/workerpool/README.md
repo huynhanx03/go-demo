@@ -28,7 +28,7 @@ import (
 	"sync"
 	"time"
 
-	"search-radius/go-common/pkg/common/workerpool"
+	"search-radius/pkg/common/workerpool"
 )
 
 func main() {
@@ -58,7 +58,7 @@ package main
 import (
 	"fmt"
 
-	"search-radius/go-common/pkg/common/workerpool"
+	"search-radius/pkg/common/workerpool"
 )
 
 func main() {

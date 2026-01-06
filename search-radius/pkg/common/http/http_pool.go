@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"search-radius/go-common/pkg/utils"
+	"search-radius/pkg/utils"
 )
 
 type HTTPClientPool struct {

@@ -1,7 +1,7 @@
 package mongodb
 
 import (
-	"search-radius/go-common/pkg/settings"
+	"search-radius/pkg/settings"
 )
 
 // New creates a new MongoDB connection

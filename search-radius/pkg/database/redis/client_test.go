@@ -12,7 +12,7 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 
-	"search-radius/go-common/pkg/settings"
+	"search-radius/pkg/settings"
 )
 
 const (

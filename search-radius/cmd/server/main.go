@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"log"
+
+	"search-radius/internal/infrastructure"
+)
 
 func main() {
-	fmt.Println("Hello World")
+	if err := infrastructure.Run(); err != nil {
+		log.Fatalf("server failed to start: %v", err)
+	}
 }

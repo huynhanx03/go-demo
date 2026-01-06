@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	"search-radius/go-common/pkg/dto"
+	"search-radius/pkg/dto"
 )
 
 // BaseRepository provides common database operations using generics
@@ -64,11 +64,11 @@ func (r *BaseRepository[T]) Create(ctx context.Context, model *T) error {
 }
 
 // Update updates a document by ID
-func (r *BaseRepository[T]) Update(ctx context.Context, id primitive.ObjectID, model *T) error {
+func (r *BaseRepository[T]) Update(ctx context.Context, model *T) error {
 	(*model).UpdateTimestamp()
 
 	update := bson.M{"$set": model}
-	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": (*model).GetID()}, update)
 	return err
 }
 
@@ -76,15 +76,6 @@ func (r *BaseRepository[T]) Update(ctx context.Context, id primitive.ObjectID, m
 func (r *BaseRepository[T]) Delete(ctx context.Context, id primitive.ObjectID) error {
 	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": id})
 	return err
-}
-
-// DeleteMany removes multiple documents based on filter
-func (r *BaseRepository[T]) DeleteMany(ctx context.Context, filter bson.M) (int64, error) {
-	result, err := r.collection.DeleteMany(ctx, filter)
-	if err != nil {
-		return 0, err
-	}
-	return result.DeletedCount, nil
 }
 
 // Exists checks whether a document exists by its ID
@@ -97,7 +88,7 @@ func (r *BaseRepository[T]) Exists(ctx context.Context, id primitive.ObjectID) (
 }
 
 // Find retrieves documents with pagination, search/filter, and sorting
-func (r *BaseRepository[T]) Find(ctx context.Context, opts *dto.QueryOptions) (*dto.Paginated[T], error) {
+func (r *BaseRepository[T]) Find(ctx context.Context, opts *dto.QueryOptions) (*dto.Paginated[*T], error) {
 	if opts == nil {
 		opts = &dto.QueryOptions{}
 	}
@@ -106,17 +97,9 @@ func (r *BaseRepository[T]) Find(ctx context.Context, opts *dto.QueryOptions) (*
 	}
 	opts.Pagination.SetDefaults()
 
-	// Build filter from search/filter options
-	filter := BuildFilter(&opts.Filters)
+	// Build filter and options using unified helper
+	filter, findOpts := ApplyQueryOptions(opts)
 
-	// Cursor pagination: if cursor is present, filter by _id < cursor (assuming desc sort)
-	if opts.Pagination.Cursor != "" {
-		if oid, err := primitive.ObjectIDFromHex(opts.Pagination.Cursor); err == nil {
-			filter["_id"] = bson.M{"$lt": oid}
-		}
-	}
-
-	// Count total documents
 	totalItems, err := r.collection.CountDocuments(ctx, filter)
 	if err != nil {
 		return nil, err
@@ -125,27 +108,56 @@ func (r *BaseRepository[T]) Find(ctx context.Context, opts *dto.QueryOptions) (*
 	// Calculate pagination info
 	pagination := dto.CalculatePagination(opts.Pagination.Page, opts.Pagination.PageSize, totalItems)
 
-	// Build sort from sort options
-	sort := BuildSort(&opts.Sort)
-
-	// Find documents with pagination and sorting
-	findOpts := GetPaginationOptions(opts.Pagination)
-	findOpts.SetSort(sort)
-
 	cursor, err := r.collection.Find(ctx, filter, findOpts)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	// Decode documents
-	var records []T
+	// Decode documents into slice of pointers
+	var records []*T
 	if err := cursor.All(ctx, &records); err != nil {
 		return nil, err
 	}
 
-	return &dto.Paginated[T]{
+	return &dto.Paginated[*T]{
 		Records:    &records,
 		Pagination: pagination,
 	}, nil
+}
+
+// BatchCreate inserts multiple documents
+func (r *BaseRepository[T]) BatchCreate(ctx context.Context, models []*T) error {
+	if len(models) == 0 {
+		return nil
+	}
+
+	// mongo-driver InsertMany requires []interface{}
+	items := make([]interface{}, len(models))
+	for i, v := range models {
+		items[i] = v
+	}
+
+	res, err := r.collection.InsertMany(ctx, items)
+	if err != nil {
+		return err
+	}
+
+	for i, id := range res.InsertedIDs {
+		if oid, ok := id.(primitive.ObjectID); ok {
+			(*models[i]).SetID(oid)
+		}
+	}
+
+	return nil
+}
+
+// BatchDelete removes multiple documents by IDs
+func (r *BaseRepository[T]) BatchDelete(ctx context.Context, ids []primitive.ObjectID) error {
+	if len(ids) == 0 {
+		return nil
+	}
+
+	_, err := r.collection.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": ids}})
+	return err
 }

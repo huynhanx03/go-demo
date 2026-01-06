@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"search-radius/pkg/utils"
+
 	"github.com/IBM/sarama"
-	"search-radius/go-common/pkg/utils"
 )
 
 // asyncProducer wraps sarama.AsyncProducer

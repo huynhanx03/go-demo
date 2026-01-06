@@ -3,7 +3,7 @@ package utils
 import (
 	"time"
 
-	"search-radius/go-common/pkg/constraints"
+	"search-radius/pkg/constraints"
 )
 
 // ToDuration converts any integer type (seconds) to time.Duration.
