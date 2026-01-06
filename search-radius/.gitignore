@@ -1,0 +1,5 @@
+.env
+.vscode
+
+storages/logs
+internal/adapters/driven/db/ent/generate
